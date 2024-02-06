@@ -80,3 +80,15 @@ spec:
   resources:
     requests:
       storage: 1Gi
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+        - matchExpressions:
+          - key: app
+            operator: In
+            values:
+              - acmefit
+          - key: service
+            operator: In
+            values:
+              - users-mongo

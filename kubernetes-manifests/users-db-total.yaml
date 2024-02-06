@@ -58,11 +58,23 @@ spec:
             - mountPath: /docker-entrypoint-initdb.d
               name: mongo-initdb
       volumes:
-        - name: mongodata
-          emptyDir: {}
+        # - name: mongodata
+        #   emptyDir: {}
         - name: mongo-initdb
           configMap:
             name: users-initdb-config
-#        - name: mongodata
-#          persistentVolumeClaim:
-#            claimName: mongodata
+        - name: mongodata
+          persistentVolumeClaim:
+            claimName: mongodata
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: mongodata-users-mongo
+  namespace: acme-fitness
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi

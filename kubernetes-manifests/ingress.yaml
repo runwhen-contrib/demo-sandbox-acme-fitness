@@ -1,0 +1,20 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    external-dns.alpha.kubernetes.io/hostname: acme-fitness.sandbox.runwhen.com.
+  name: acme-fitness
+  namespace: acme-fitness
+spec:
+  ingressClassName: "ingress-nginx"
+  rules:
+  - host: acme-fitness.sandbox.runwhen.com
+    http:
+      paths:
+      - backend:
+          service:
+            name: frontend
+            port:
+              number: 80
+        path: /
+        pathType: Prefix

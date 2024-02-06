@@ -26,34 +26,33 @@ spec:
     type: Recreate
   selector:
     matchLabels:
-      app: acmefit  # has to match .spec.template.metadata.labels
+      app: acmefit # has to match .spec.template.metadata.labels
       service: users-mongo
   replicas: 1
   template:
     metadata:
       labels:
-        app: acmefit  # has to match .spec.selector.matchLabels
+        app: acmefit # has to match .spec.selector.matchLabels
         service: users-mongo
     spec:
       containers:
         - name: users-mongo
           image: mongo:4
-          resources:
-            {}
+          resources: {}
           ports:
             - name: users-mongo
               containerPort: 27017
               protocol: "TCP"
           env:
-          - name: MONGO_INITDB_ROOT_USERNAME
-            value: 'mongoadmin'
-          - name: MONGO_INITDB_DATABASE
-            value: 'acmefit'
-          - name: MONGO_INITDB_ROOT_PASSWORD
-            valueFrom:
-              secretKeyRef:
-                name: users-mongo-pass
-                key: password
+            - name: MONGO_INITDB_ROOT_USERNAME
+              value: 'mongoadmin'
+            - name: MONGO_INITDB_DATABASE
+              value: 'acmefit'
+            - name: MONGO_INITDB_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: users-mongo-pass
+                  key: password
           volumeMounts:
             - mountPath: /data/db
               name: mongodata
@@ -80,16 +79,16 @@ spec:
     - ReadWriteOnce
   resources:
     requests:
-      storage: 2Gi
+      storage: 4Gi
   nodeAffinity:
     required:
       nodeSelectorTerms:
         - matchExpressions:
-          - key: app
-            operator: In
-            values:
-              - acmefit
-          - key: service
-            operator: In
-            values:
-              - users-mongo
+            - key: app
+              operator: In
+              values:
+                - acmefit
+            - key: service
+              operator: In
+              values:
+                - users-mongo

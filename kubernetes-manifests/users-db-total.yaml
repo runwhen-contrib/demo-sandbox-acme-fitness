@@ -75,6 +75,7 @@ metadata:
   name: mongodata-users-mongo
   namespace: acme-fitness
 spec:
+  storageClass: standard
   accessModes:
     - ReadWriteOnce
   resources:

@@ -22,6 +22,8 @@ metadata:
     app: acmefit
     service: users-mongo
 spec:
+  strategy:
+    type: Recreate
   selector:
     matchLabels:
       app: acmefit  # has to match .spec.template.metadata.labels

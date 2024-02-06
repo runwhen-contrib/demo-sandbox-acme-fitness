@@ -36,57 +36,57 @@ spec:
         service: order
     spec:
       volumes:
-      - name: acmefit-order-data
-        emptyDir: {}
+        - name: acmefit-order-data
+          emptyDir: {}
       containers:
-      - image: gcr.io/vmwarecloudadvocacy/acmeshop-order:latest
-        # orderpostgres:latest
-        name: order
-        env:
-        - name: ORDER_DB_HOST
-          value: order-postgres
-        - name: ORDER_DB_PASSWORD
-          valueFrom:
-            secretKeyRef:
-              name: order-postgres-pass
-              key: password
-        - name: ORDER_DB_PORT
-          value: '5432'
-        - name: AUTH_MODE
-          value: '1'
-        - name: ORDER_DB_USERNAME
-          value: pgbench
-        - name: PGPASSWORD
-          valueFrom:
-            secretKeyRef:
-              name: order-postgres-pass
-              key: password
-        - name: ORDER_AUTH_DB
-          value: postgres
-        - name: ORDER_PORT
-          value: '6000'
-        - name: PAYMENT_PORT
-          value: '9000'
-        - name: PAYMENT_HOST
-          value: 'payment'
-        - name: USER_HOST
-          value: 'users'
-        - name: USER_PORT
-          value: '8083'
-        - name: JAEGER_AGENT_HOST
-          value: 'localhost'
-        - name: JAEGER_AGENT_PORT
-          value: '6831'
-        ports:
-        - containerPort: 6000
+        - image: gcr.io/vmwarecloudadvocacy/acmeshop-order:latest
+          # orderpostgres:latest
           name: order
-        volumeMounts:
-        - mountPath: "/data"
-          name: "acmefit-order-data"
-        resources:
-          requests:
-            memory: "64Mi"
-            cpu: "100m"
-          limits:
-            memory: "256Mi"
-            cpu: "500m"
+          env:
+            - name: ORDER_DB_HOST
+              value: order-postgres
+            - name: ORDER_DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: order-postgres-pass
+                  key: password
+            - name: ORDER_DB_PORT
+              value: '5432'
+            - name: AUTH_MODE
+              value: '1'
+            - name: ORDER_DB_USERNAME
+              value: pgbench
+            - name: PGPASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: order-postgres-pass
+                  key: password
+            - name: ORDER_AUTH_DB
+              value: postgres
+            - name: ORDER_PORT
+              value: '6000'
+            - name: PAYMENT_PORT
+              value: '9000'
+            - name: PAYMENT_HOST
+              value: 'payment'
+            - name: USER_HOST
+              value: 'users'
+            - name: USER_PORT
+              value: '8083'
+            - name: JAEGER_AGENT_HOST
+              value: 'localhost'
+            - name: JAEGER_AGENT_PORT
+              value: '6831'
+          ports:
+            - containerPort: 6000
+              name: order
+          volumeMounts:
+            - mountPath: "/data"
+              name: "acmefit-order-data"
+          resources:
+            requests:
+              memory: "64Mi"
+              cpu: "100m"
+            limits:
+              memory: "256Mi"
+              cpu: "500m"

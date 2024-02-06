@@ -67,7 +67,7 @@ spec:
             name: users-initdb-config
         - name: mongodata
           persistentVolumeClaim:
-            claimName: mongodata
+            claimName: mongodata-users-mongo
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim

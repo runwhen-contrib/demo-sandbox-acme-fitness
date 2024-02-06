@@ -38,15 +38,15 @@ spec:
         service: pos
     spec:
       containers:
-      - image: gcr.io/vmwarecloudadvocacy/acmeshop-pos:v0.1.0-beta
-        name: pos
-        env:
-        - name: HTTP_PORT
-          value: '7777'
-        - name: DATASTORE
-          value: 'REMOTE'
-        - name: FRONTEND_HOST
-          value: 'frontend.default.svc.cluster.local'
-        ports:
-        - containerPort: 7777
+        - image: gcr.io/vmwarecloudadvocacy/acmeshop-pos:v0.1.0-beta
           name: pos
+          env:
+            - name: HTTP_PORT
+              value: '7777'
+            - name: DATASTORE
+              value: 'REMOTE'
+            - name: FRONTEND_HOST
+              value: 'frontend.default.svc.cluster.local'
+          ports:
+            - containerPort: 7777
+              name: pos

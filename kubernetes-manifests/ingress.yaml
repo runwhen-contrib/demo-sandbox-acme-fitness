@@ -8,13 +8,13 @@ metadata:
 spec:
   ingressClassName: "ingress-nginx"
   rules:
-  - host: acme-fitness.sandbox.runwhen.com
-    http:
-      paths:
-      - backend:
-          service:
-            name: frontend
-            port:
-              number: 80
-        path: /
-        pathType: Prefix
+    - host: acme-fitness.sandbox.runwhen.com
+      http:
+        paths:
+          - backend:
+              service:
+                name: frontend
+                port:
+                  number: 80
+            path: /
+            pathType: Prefix

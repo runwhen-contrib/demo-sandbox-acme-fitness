@@ -23,13 +23,13 @@ metadata:
 spec:
   selector:
     matchLabels:
-      app: acmefit  # has to match .spec.template.metadata.labels
+      app: acmefit # has to match .spec.template.metadata.labels
       service: users-redis
   replicas: 1
   template:
     metadata:
       labels:
-        app: acmefit  # has to match .spec.selector.matchLabels
+        app: acmefit # has to match .spec.selector.matchLabels
         service: users-redis
     spec:
       containers:
@@ -45,18 +45,18 @@ spec:
               containerPort: 6379
               protocol: "TCP"
           env:
-          - name: REDIS_HOST
-            value: 'users-redis'
-          - name: REDIS_PASSWORD
-            valueFrom:
-              secretKeyRef:
-                name: users-redis-pass
-                key: password
+            - name: REDIS_HOST
+              value: 'users-redis'
+            - name: REDIS_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: users-redis-pass
+                  key: password
           volumeMounts:
             - mountPath: /var/lib/redis
               name: users-redis-data
-#            - mountPath: /etc/redis
-#              name: redis-config
+              #            - mountPath: /etc/redis
+              #              name: redis-config
       volumes:
         - name: users-redis-data
           emptyDir: {}

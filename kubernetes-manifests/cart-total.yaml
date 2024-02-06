@@ -36,44 +36,44 @@ spec:
         service: cart
     spec:
       volumes:
-      - name: acmefit-cart-data
-        emptyDir: {}
+        - name: acmefit-cart-data
+          emptyDir: {}
       containers:
-      - image: gcr.io/vmwarecloudadvocacy/acmeshop-cart:latest
-        imagePullPolicy: "Always"
-        name: cart
-        env:
-        - name: REDIS_HOST
-          value: 'cart-redis'
-        - name: REDIS_PASSWORD
-          valueFrom:
-            secretKeyRef:
-              name: cart-redis-pass
-              key: password
-        - name: REDIS_PORT
-          value: '6379'
-        - name: CART_PORT
-          value: '5000'
-        - name: USER_HOST
-          value: 'users'
-        - name: USER_PORT
-          value: '8083'
-        - name: JAEGER_AGENT_HOST
-          value: 'localhost'
-        - name: JAEGER_AGENT_PORT
-          value: '6831'
-        - name: AUTH_MODE
-          value: '1'
-        ports:
-        - containerPort: 5000
+        - image: gcr.io/vmwarecloudadvocacy/acmeshop-cart:latest
+          imagePullPolicy: "Always"
           name: cart
-        volumeMounts:
-        - mountPath: "/data"
-          name: "acmefit-cart-data"
-        resources:
-          requests:
-            memory: "64Mi"
-            cpu: "100m"
-          limits:
-            memory: "256Mi"
-            cpu: "500m"
+          env:
+            - name: REDIS_HOST
+              value: 'cart-redis'
+            - name: REDIS_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: cart-redis-pass
+                  key: password
+            - name: REDIS_PORT
+              value: '6379'
+            - name: CART_PORT
+              value: '5000'
+            - name: USER_HOST
+              value: 'users'
+            - name: USER_PORT
+              value: '8083'
+            - name: JAEGER_AGENT_HOST
+              value: 'localhost'
+            - name: JAEGER_AGENT_PORT
+              value: '6831'
+            - name: AUTH_MODE
+              value: '1'
+          ports:
+            - containerPort: 5000
+              name: cart
+          volumeMounts:
+            - mountPath: "/data"
+              name: "acmefit-cart-data"
+          resources:
+            requests:
+              memory: "64Mi"
+              cpu: "100m"
+            limits:
+              memory: "256Mi"
+              cpu: "500m"

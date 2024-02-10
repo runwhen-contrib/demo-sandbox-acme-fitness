@@ -52,7 +52,7 @@ spec:
               memory: "256Mi"
               cpu: "500m"
           command: ["locust"]
-          args: ["-f locustfile.py", "--headless -u 20 -r 5", "--run-time 1h", "--host=http://acme-fitness.sandbox.runwhen.com"]
+          args: ["-f /data/locustfile.py", "--headless -u 20 -r 5", "--run-time 1h", "--host=http://acme-fitness.sandbox.runwhen.com"]
           volumeMounts:
             - mountPath: "/data"
               name: "acmefit-loadgenerator-data"

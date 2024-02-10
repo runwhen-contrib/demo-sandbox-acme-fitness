@@ -40,7 +40,7 @@ spec:
         - image: locustio/locust:latest
           imagePullPolicy: "Always"
           name: loadgenerator
-          env:[]
+          env: []
           ports:
             - containerPort: 8089
               name: loadgenerator

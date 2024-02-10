@@ -35,9 +35,9 @@ spec:
         app: acmefit
         service: catalog
     spec:
-      volumes:
-        - name: acmefit-catalog-data
-          emptyDir: {}
+      # volumes:
+      #   - name: acmefit-catalog-data
+      #     emptyDir: {}
       containers:
         - image: gcr.io/vmwarecloudadvocacy/acmeshop-catalog:latest
           imagePullPolicy: "Always"
@@ -79,3 +79,32 @@ spec:
             limits:
               memory: "256Mi"
               cpu: "500m"
+      volumes:
+        - name: acmefit-catalog-data
+          persistentVolumeClaim:
+            claimName: catalog-pvc
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: acmefit-catalog-data
+  namespace: acme-fitness
+spec:
+  storageClassName: standard
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+        - matchExpressions:
+            - key: app
+              operator: In
+              values:
+                - acmefit
+            - key: service
+              operator: In
+              values:
+                - catalog

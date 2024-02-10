@@ -60,6 +60,7 @@ spec:
         - name: acmefit-loadgenerator-data
           configMap:
             name: locustfile
+            defaultMode: 0777
 ---
 apiVersion: v1
 kind: ConfigMap

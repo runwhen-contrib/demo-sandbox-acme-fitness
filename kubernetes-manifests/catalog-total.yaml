@@ -82,7 +82,7 @@ spec:
       volumes:
         - name: acmefit-catalog-data
           persistentVolumeClaim:
-            claimName: catalog-pvc
+            claimName: acmefit-catalog-data
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim

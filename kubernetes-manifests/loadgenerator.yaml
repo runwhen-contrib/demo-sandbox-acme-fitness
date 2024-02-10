@@ -60,7 +60,7 @@ spec:
            - "-u 20"
            - "-r 5"
            - "--run-time 1h"
-           - "--host=http://acme-fitness.sandbox.runwhen.com"]
+           - "--host=http://acme-fitness.sandbox.runwhen.com"
           volumeMounts:
             - mountPath: "/data"
               name: "acmefit-loadgenerator-data"

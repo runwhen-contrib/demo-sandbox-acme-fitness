@@ -65,5 +65,33 @@ spec:
             - mountPath: /var/lib/postgresql/data
               name: postgredb
       volumes:
+        # - name: postgredb
+        #   emptyDir: {}
         - name: postgredb
-          emptyDir: {}
+          persistentVolumeClaim:
+            claimName: postgredb
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: postgredb
+  namespace: acme-fitness
+spec:
+  storageClassName: standard
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+        - matchExpressions:
+            - key: app
+              operator: In
+              values:
+                - acmefit
+            - key: service
+              operator: In
+              values:
+                - order-db

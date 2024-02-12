@@ -60,10 +60,37 @@ spec:
               #              name: redis-config
       volumes:
         - name: cart-redis-data
-          emptyDir: {}
+          persistentVolumeClaim:
+            claimName: cart-redis-data
+        # - name: cart-redis-data
+        #   emptyDir: {}
 #        - name: redis-config
 #          configMap:
 #            name: redis-config
 #            items:
 #              - key: redis-config
 #                path: redis.conf
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: cart-redis-data
+spec:
+  storageClassName: standard
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+        - matchExpressions:
+            - key: app
+              operator: In
+              values:
+                - acmefit
+            - key: service
+              operator: In
+              values:
+                - cart-redis

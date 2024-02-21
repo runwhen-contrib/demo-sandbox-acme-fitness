@@ -107,7 +107,7 @@ class AuthUserBrowsing(UserBrowsing):
         else:
             logging.warning("failed to remove cart entry. item: "+productid+" for user: "+userid)
 
-    @task
+    @task(3)
     def login(self):
         """Login a random user"""
         user = random.choice(users)
@@ -133,13 +133,13 @@ class AuthUserBrowsing(UserBrowsing):
                   "quantity": random.randint(1,2),
                   "itemid": productid
                 })
-    @task
+    @task(2)
     def removeFromCart(self):
         """Remove a random product from the cart. Helps prevent the cart from overflowing"""
         products = self.listCatalogItems()
         productid = random.choice(products)
         self.removeProductFromCart(self.user.userid, productid)
-    @task
+    @task(5)
     def checkout(self):
         if not self.user.userid:
             logging.warning("Not logged in, skipping 'Add to Checkout'")
@@ -152,4 +152,4 @@ class WebSiteUser(HttpUser):
     sleep(3)  # Sleep on start of a user incase the target app isn't completely accessible yet.
     tasks = [UserBehavior]
     userid = ""
-    wait_time = between(0.5, 3)
+    wait_time = between(0.25, 0.5)

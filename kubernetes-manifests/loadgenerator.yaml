@@ -230,7 +230,7 @@ data:
             userCart = self.client.get("/cart/items/" + self.user.userid).json()
             order = self.client.post("/order/add/"+ self.user.userid, json=self.Order_Info)
     class UserBehavior(SequentialTaskSet):
-        tasks = [AuthUserBrowsing, UserBrowsing]
+        tasks = [AuthUserBrowsing]
     class WebSiteUser(HttpUser):
         sleep(3)  # Sleep on start of a user incase the target app isn't completely accessible yet.
         tasks = [UserBehavior]

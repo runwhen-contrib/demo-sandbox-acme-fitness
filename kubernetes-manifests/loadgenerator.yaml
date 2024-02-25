@@ -190,7 +190,7 @@ data:
             else:
                 logging.warning("failed to remove cart entry. item: "+productid+" for user: "+userid)
 
-        @task(3)
+        @task(6)
         def login(self):
             """Login a random user"""
             user = random.choice(users)
@@ -199,7 +199,7 @@ data:
             if response.ok:
                 body = response.json()
                 self.user.userid = body["token"]
-        @task(2)
+        @task(8)
         def addToCart(self):
             """Randomly adds 1 or 2 of a random product to the cart"""
             products = self.listCatalogItems()
@@ -222,7 +222,7 @@ data:
             products = self.listCatalogItems()
             productid = random.choice(products)
             self.removeProductFromCart(self.user.userid, productid)
-        @task(5)
+        @task(10)
         def checkout(self):
             if not self.user.userid:
                 logging.warning("Not logged in, skipping 'Add to Checkout'")
@@ -230,7 +230,7 @@ data:
             userCart = self.client.get("/cart/items/" + self.user.userid).json()
             order = self.client.post("/order/add/"+ self.user.userid, json=self.Order_Info)
     class UserBehavior(SequentialTaskSet):
-        tasks = [AuthUserBrowsing]
+        tasks = [AuthUserBrowsing, UserBrowsing]
     class WebSiteUser(HttpUser):
         sleep(3)  # Sleep on start of a user incase the target app isn't completely accessible yet.
         tasks = [UserBehavior]

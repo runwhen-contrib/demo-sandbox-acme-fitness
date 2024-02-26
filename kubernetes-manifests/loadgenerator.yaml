@@ -191,7 +191,7 @@ data:
             if response.ok:
                 body = response.json()
                 # Safely access the 'token' key, considering it might not be present
-                token = body.get("token")
+                token = body.get("access_token")
                 if token:
                     self.user.token = token  # Assuming you meant to store the token here
                 else:

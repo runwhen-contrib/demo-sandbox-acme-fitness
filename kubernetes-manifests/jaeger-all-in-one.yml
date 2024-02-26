@@ -61,6 +61,10 @@ items:
                   protocol: TCP
                 - containerPort: 9411
                   protocol: TCP
+              resources:
+                requests:
+                  memory: "512Mi"
+                  cpu: "250m"
               readinessProbe:
                 httpGet:
                   path: "/"

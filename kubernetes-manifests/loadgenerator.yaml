@@ -186,7 +186,7 @@ data:
         def login(self):
             """Login a random user"""
             user = random.choice(users)
-            logging.debug("Auth User - Login user " + user)
+            logging.warning("Auth User - Login user " + user)
             response = self.client.post("/login/", json={"username": user, "password": "vmware1!"})
             if response.ok:
                 body = response.json()
@@ -195,10 +195,10 @@ data:
                 if token:
                     self.user.token = token  # Assuming you meant to store the token here
                 else:
-                    logging.error("Token not found in login response")
+                    logging.warning("Token not found in login response")
                     # Handle cases where token is missing - perhaps by setting a flag or retrying login
             else:
-                logging.error(f"Login failed for user {user}, status code {response.status_code}")
+                logging.warning(f"Login failed for user {user}, status code {response.status_code}")
 
         @task
         def checkout(self):

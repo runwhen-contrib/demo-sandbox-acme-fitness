@@ -187,7 +187,7 @@ data:
             """Login a random user"""
             user = random.choice(users)
             logging.warning("Auth User - Login user " + user)
-            response = self.client.post("/login/", json={"username": user, "password": "vmware1!"})
+            response = self.client.post("/login/", json={"username": "walter", "password": "vmware1!"})
             if response.ok:
                 body = response.json()
                 # Safely access the 'token' key, considering it might not be present

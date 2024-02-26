@@ -190,7 +190,7 @@ data:
             else:
                 logging.warning("failed to remove cart entry. item: "+productid+" for user: "+userid)
 
-        @task(2)
+        @task(3)
         def login(self):
             """Login a random user"""
             user = random.choice(users)
@@ -199,24 +199,24 @@ data:
             if response.ok:
                 body = response.json()
                 self.user.userid = body["token"]
-        @task(4)
-        def addToCart(self):
-            """Randomly adds 1 or 2 of a random product to the cart"""
-            products = self.listCatalogItems()
-            productid = random.choice(products)
-            if not self.user.userid:
-                logging.warning("Not logged in, skipping 'Add to Cart'")
-                return
-            logging.debug("Add to Cart for user " + self.user.userid)
-            details = self.getProductDetails(productid)
-            cart = self.client.post("/cart/item/add/" + self.user.userid, json={
-                      "name": details["name"],
-                      "price": details["price"],
-                      "shortDescription": "Test add to cart",
-                      "quantity": random.randint(1,2),
-                      "itemid": productid
-                    })
-        # @task
+        # @task(2)
+        # def addToCart(self):
+        #     """Randomly adds 1 or 2 of a random product to the cart"""
+        #     products = self.listCatalogItems()
+        #     productid = random.choice(products)
+        #     if not self.user.userid:
+        #         logging.warning("Not logged in, skipping 'Add to Cart'")
+        #         return
+        #     logging.debug("Add to Cart for user " + self.user.userid)
+        #     details = self.getProductDetails(productid)
+        #     cart = self.client.post("/cart/item/add/" + self.user.userid, json={
+        #               "name": details["name"],
+        #               "price": details["price"],
+        #               "shortDescription": "Test add to cart",
+        #               "quantity": random.randint(1,2),
+        #               "itemid": productid
+        #             })
+        # @task(2)
         # def removeFromCart(self):
         #     """Remove a random product from the cart. Helps prevent the cart from overflowing"""
         #     products = self.listCatalogItems()
@@ -232,7 +232,7 @@ data:
     class UserBehavior(SequentialTaskSet):
         tasks = [AuthUserBrowsing]
     class WebSiteUser(HttpUser):
-        sleep(1)  # Sleep on start of a user incase the target app isn't completely accessible yet.
+        sleep(3)  # Sleep on start of a user incase the target app isn't completely accessible yet.
         tasks = [UserBehavior]
         userid = ""
         wait_time = between(1, 3)

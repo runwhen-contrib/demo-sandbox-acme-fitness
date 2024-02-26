@@ -186,14 +186,16 @@ data:
         def login(self):
             """Login a random user"""
             user = random.choice(users)
+            headers = {"Content-Type": "application/json"}  # Explicitly setting the Content-Type header
             logging.warning("Auth User - Login user " + user)
-            response = self.client.post("/login/", json={"username": "walter", "password": "vmware1!"})
+            response = self.client.post("/login/", json={"username": user, "password": "vmware1!"}, headers=headers)
             if response.ok:
                 body = response.json()
                 # Safely access the 'token' key, considering it might not be present
                 token = body.get("access_token")
                 if token:
                     self.user.token = token  # Assuming you meant to store the token here
+                    logging.warning("Successfully logged in")
                 else:
                     logging.warning("Token not found in login response")
                     # Handle cases where token is missing - perhaps by setting a flag or retrying login

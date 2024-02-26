@@ -68,7 +68,7 @@ spec:
             - name: JAEGER_AGENT_HOST
               value: 'jaeger-agent'
             - name: JAEGER_AGENT_PORT
-              value: '6832'
+              value: '6831'
           ports:
             - containerPort: 8083
               name: users

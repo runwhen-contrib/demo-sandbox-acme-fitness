@@ -190,7 +190,7 @@ data:
             else:
                 logging.warning("failed to remove cart entry. item: "+productid+" for user: "+userid)
 
-        @task(3)
+        @task
         def login(self):
             """Login a random user"""
             user = random.choice(users)

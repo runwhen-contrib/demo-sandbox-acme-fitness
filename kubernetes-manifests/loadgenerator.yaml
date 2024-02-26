@@ -182,15 +182,7 @@ data:
 
         def on_start(self):
             self.login()
-        def removeProductFromCart(self, userid, productid):
-            """Removes a specific product from the cart by setting the quantity of the product to 0"""
-            response = self.client.post("/cart/item/modify/"+userid, json={"itemid": productid, "quantity": 0})
-            if response.ok:
-                logging.debug("Auth User - Removed item: "+productid+" for user: "+userid)
-            else:
-                logging.warning("failed to remove cart entry. item: "+productid+" for user: "+userid)
 
-        @task(3)
         def login(self):
             """Login a random user"""
             user = random.choice(users)
@@ -199,29 +191,7 @@ data:
             if response.ok:
                 body = response.json()
                 self.user.userid = body["token"]
-        # @task(2)
-        # def addToCart(self):
-        #     """Randomly adds 1 or 2 of a random product to the cart"""
-        #     products = self.listCatalogItems()
-        #     productid = random.choice(products)
-        #     if not self.user.userid:
-        #         logging.warning("Not logged in, skipping 'Add to Cart'")
-        #         return
-        #     logging.debug("Add to Cart for user " + self.user.userid)
-        #     details = self.getProductDetails(productid)
-        #     cart = self.client.post("/cart/item/add/" + self.user.userid, json={
-        #               "name": details["name"],
-        #               "price": details["price"],
-        #               "shortDescription": "Test add to cart",
-        #               "quantity": random.randint(1,2),
-        #               "itemid": productid
-        #             })
-        # @task(2)
-        # def removeFromCart(self):
-        #     """Remove a random product from the cart. Helps prevent the cart from overflowing"""
-        #     products = self.listCatalogItems()
-        #     productid = random.choice(products)
-        #     self.removeProductFromCart(self.user.userid, productid)
+
         @task(5)
         def checkout(self):
             if not self.user.userid:

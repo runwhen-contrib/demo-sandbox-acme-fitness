@@ -206,6 +206,11 @@ data:
         def checkout(self):
             if not self.user.userid:
                 logging.warning("Not logged in, skipping 'Add to Checkout'")
+                self.login()
+                headers = {"Content-Type": "application/json"}  # Explicitly setting the Content-Type header
+                userCart = self.client.get("/cart/items/" + self.user.userid).json()
+                order = self.client.post("/order/add/"+ self.user.userid, json=self.Order_Info, headers=headers)
+                logging.warning(f"Posting order")
                 return
             headers = {"Content-Type": "application/json"}  # Explicitly setting the Content-Type header
             userCart = self.client.get("/cart/items/" + self.user.userid).json()

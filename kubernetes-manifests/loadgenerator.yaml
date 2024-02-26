@@ -187,10 +187,18 @@ data:
             """Login a random user"""
             user = random.choice(users)
             logging.debug("Auth User - Login user " + user)
-            response = self.client.post("/login/", json={"username": user, "password":"vmware1!"})
+            response = self.client.post("/login/", json={"username": user, "password": "vmware1!"})
             if response.ok:
                 body = response.json()
-                self.user.userid = body["token"]
+                # Safely access the 'token' key, considering it might not be present
+                token = body.get("token")
+                if token:
+                    self.user.token = token  # Assuming you meant to store the token here
+                else:
+                    logging.error("Token not found in login response")
+                    # Handle cases where token is missing - perhaps by setting a flag or retrying login
+            else:
+                logging.error(f"Login failed for user {user}, status code {response.status_code}")
 
         @task(5)
         def checkout(self):

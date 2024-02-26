@@ -200,7 +200,7 @@ data:
             else:
                 logging.error(f"Login failed for user {user}, status code {response.status_code}")
 
-        @task(5)
+        @task
         def checkout(self):
             if not self.user.userid:
                 logging.warning("Not logged in, skipping 'Add to Checkout'")

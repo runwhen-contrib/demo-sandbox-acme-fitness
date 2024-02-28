@@ -67,4 +67,3 @@ spec:
 #            items:
 #              - key: redis-config
 #                path: redis.conf
-

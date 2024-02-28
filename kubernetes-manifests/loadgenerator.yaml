@@ -54,18 +54,18 @@ spec:
           # command: ["/bin/sh"]
           # args: ["-c", "sleep 5000"]
           command:
-           - "locust"
-          args: 
-           - "-f"
-           - "/data/locustfile.py"
-           - "--headless"
-           - "-u"
-           - "100"
-           - "-r" 
-           - "5"
-          #  - "--run-time"
-          #  - "1h"
-           - "--host=http://acme-fitness.sandbox.runwhen.com"
+            - "locust"
+          args:
+            - "-f"
+            - "/data/locustfile.py"
+            - "--headless"
+            - "-u"
+            - "100"
+            - "-r"
+            - "5"
+            #  - "--run-time"
+            #  - "1h"
+            - "--host=http://acme-fitness.sandbox.runwhen.com"
           volumeMounts:
             - mountPath: "/data"
               name: "acmefit-loadgenerator-data"
@@ -80,149 +80,4 @@ kind: ConfigMap
 metadata:
   name: locustfile
 data:
-  locustfile.py: |
-    # This program will generate traffic for ACME Fitness Shop App. It simulates both Authenticated and Guest user scenarios. You can run this program either from Command line or from
-    # the web based UI. Refer to the "locust" documentation for further information. 
-    from time import sleep
-    from locust import HttpUser, task, SequentialTaskSet, between
-    import random
-    import logging
-
-    # List of users (pre-loaded into ACME Fitness shop)
-    users = ["eric", "phoebe", "dwight", "han", "elaine", "walter"]
-
-    # GuestUserBrowsing simulates traffic for a Guest User (Not logged in)
-    class UserBrowsing(SequentialTaskSet):
-        def on_start(self):
-            self.getProducts()
-        def listCatalogItems(self):
-            products = []
-            response = self.client.get("/products")
-            if response.ok:
-                items = response.json()["data"]
-                for item in items:
-                    products.append(item["id"])
-            return products
-        def getProductDetails(self, id):
-            """Get details of a specific product"""
-            details = {}
-            response = self.client.get("/products/"+id)
-            if response.ok:
-                details = response.json()["data"]
-                logging.debug("getProductDetails: " + str(details))
-            return details
-        def getProductImages(self,id):
-            """Gets all three image URLs for a product"""
-            details = self.getProductDetails(id)
-            if details:
-                for x in range(1, 4):
-                    self.client.get(details["imageUrl"+str(x)])
-        def getProductName(self, id):
-            name = ""
-            details = self.getProductDetails(id)
-            if details:
-                name = details["name"]
-            logging.debug("NAME: "+name+ " for id: "+id)
-            return name
-
-        @task
-        def getProducts(self):
-            logging.debug("User - Get Products")
-            self.client.get("/products")
-        @task(2)
-        def getProduct(self):
-            """Get details of a specific product"""
-            logging.debug("User - Get a product")
-            products = self.listCatalogItems()
-            id = random.choice(products)
-            response = self.client.get("/products/"+ id)
-            if response.ok:
-                product = response.json()
-                logging.debug("Product info - " +  str(product))
-        @task
-        def getImages(self):
-            """Get images of a random product"""
-            logging.debug("User - Get images of random product")
-            products = self.listCatalogItems()
-            id = random.choice(products)
-            self.getProductImages(id)
-        @task(2)
-        def index(self):
-            self.client.get("/")
-
-    # AuthUserBrowsing simulates traffic for Authenticated Users (Logged in)
-    class AuthUserBrowsing(UserBrowsing):
-        """
-        AuthUserBrowsing extends the base UserBrowsing class as an authenticated user 
-        interacting with the cart and making orders
-        """
-        Order_Info = { "userid":"8888",
-                    "firstname":"Eric",
-                    "lastname": "Cartman",
-                    "address":{
-                        "street":"20 Riding Lane Av",
-                        "city":"San Francisco",
-                        "zip":"10201",
-                        "state": "CA",
-                        "country":"USA"},
-                    "email":"jblaze@marvel.com",
-                    "delivery":"UPS/FEDEX",
-                    "card":{
-                        "type":"amex/visa/mastercard/bahubali",
-                        "number":"349834797981", 
-                        "expMonth":"12",
-                        "expYear": "2022",
-                        "ccv":"123"
-                    },
-                    "cart":[
-                        {"id":"1234", "description":"redpants", "quantity":"1", "price":"4"},
-                        {"id":"5678", "description":"bluepants", "quantity":"1", "price":"4"}
-                    ],
-                    "total":"100"}
-
-        def on_start(self):
-            self.login()
-
-        def login(self):
-            """Login a random user"""
-            user = random.choice(users)
-            headers = {"Content-Type": "application/json"}  # Explicitly setting the Content-Type header
-            logging.warning("Auth User - Login user " + user)
-            response = self.client.post("/login/", json={"username": user, "password": "vmware1!"}, headers=headers)
-            if response.ok:
-                body = response.json()
-                # Safely access the 'token' key, considering it might not be present
-                token = body.get("access_token")
-                if token:
-                    self.user.token = token  # Assuming you meant to store the token here
-                    logging.warning("Successfully logged in")
-                else:
-                    logging.warning("Token not found in login response")
-                    # Handle cases where token is missing - perhaps by setting a flag or retrying login
-            else:
-                logging.warning(f"Login failed for user {user}, status code {response.status_code}")
-
-        @task
-        def checkout(self):
-            if not self.user.userid:
-                logging.warning("Not logged in, skipping 'Add to Checkout'")
-                self.login()
-                headers = {"Content-Type": "application/json"}  # Explicitly setting the Content-Type header
-                userCart = self.client.get("/cart/items/" + self.user.userid).json()
-                order = self.client.post("/order/add/"+ self.user.userid, json=self.Order_Info, headers=headers)
-                logging.warning(f"Posting order")
-                return
-            headers = {"Content-Type": "application/json"}  # Explicitly setting the Content-Type header
-            userCart = self.client.get("/cart/items/" + self.user.userid).json()
-            order = self.client.post("/order/add/"+ self.user.userid, json=self.Order_Info, headers=headers)
-            logging.warning(f"Posting order")
-    class UserBehavior(SequentialTaskSet):
-        tasks = [AuthUserBrowsing]
-    class WebSiteUser(HttpUser):
-        sleep(3)  # Sleep on start of a user incase the target app isn't completely accessible yet.
-        tasks = [UserBehavior]
-        userid = ""
-        wait_time = between(0.25, 0.5)
-
-
-    
+  locustfile.py: "# This program will generate traffic for ACME Fitness Shop App. It simulates both Authenticated and Guest user scenarios. You can run this program either from Command line or from\n# the web based UI. Refer to the \"locust\" documentation for further information. \nfrom time import sleep\nfrom locust import HttpUser, task, SequentialTaskSet, between\nimport random\nimport logging\n\n# List of users (pre-loaded into ACME Fitness shop)\nusers = [\"eric\", \"phoebe\", \"dwight\", \"han\", \"elaine\", \"walter\"]\n\n# GuestUserBrowsing simulates traffic for a Guest User (Not logged in)\nclass UserBrowsing(SequentialTaskSet):\n    def on_start(self):\n        self.getProducts()\n    def listCatalogItems(self):\n        products = []\n        response = self.client.get(\"/products\")\n        if response.ok:\n            items = response.json()[\"data\"]\n            for item in items:\n                products.append(item[\"id\"])\n        return products\n    def getProductDetails(self, id):\n        \"\"\"Get details of a specific product\"\"\"\n        details = {}\n        response = self.client.get(\"/products/\"+id)\n        if response.ok:\n            details = response.json()[\"data\"]\n            logging.debug(\"getProductDetails: \" + str(details))\n        return details\n    def getProductImages(self,id):\n        \"\"\"Gets all three image URLs for a product\"\"\"\n        details = self.getProductDetails(id)\n        if details:\n            for x in range(1, 4):\n                self.client.get(details[\"imageUrl\"+str(x)])\n    def getProductName(self, id):\n        name = \"\"\n        details = self.getProductDetails(id)\n        if details:\n            name = details[\"name\"]\n        logging.debug(\"NAME: \"+name+ \" for id: \"+id)\n        return name\n\n    @task\n    def getProducts(self):\n        logging.debug(\"User - Get Products\")\n        self.client.get(\"/products\")\n    @task(2)\n    def getProduct(self):\n        \"\"\"Get details of a specific product\"\"\"\n        logging.debug(\"User - Get a product\")\n        products = self.listCatalogItems()\n        id = random.choice(products)\n        response = self.client.get(\"/products/\"+ id)\n        if response.ok:\n            product = response.json()\n            logging.debug(\"Product info - \" +  str(product))\n    @task\n    def getImages(self):\n        \"\"\"Get images of a random product\"\"\"\n        logging.debug(\"User - Get images of random product\")\n        products = self.listCatalogItems()\n        id = random.choice(products)\n        self.getProductImages(id)\n    @task(2)\n    def index(self):\n        self.client.get(\"/\")\n\n# AuthUserBrowsing simulates traffic for Authenticated Users (Logged in)\nclass AuthUserBrowsing(UserBrowsing):\n    \"\"\"\n    AuthUserBrowsing extends the base UserBrowsing class as an authenticated user \n    interacting with the cart and making orders\n    \"\"\"\n    Order_Info = { \"userid\":\"8888\",\n                \"firstname\":\"Eric\",\n                \"lastname\": \"Cartman\",\n                \"address\":{\n                    \"street\":\"20 Riding Lane Av\",\n                    \"city\":\"San Francisco\",\n                    \"zip\":\"10201\",\n                    \"state\": \"CA\",\n                    \"country\":\"USA\"},\n                \"email\":\"jblaze@marvel.com\",\n                \"delivery\":\"UPS/FEDEX\",\n                \"card\":{\n                    \"type\":\"amex/visa/mastercard/bahubali\",\n                    \"number\":\"349834797981\", \n                    \"expMonth\":\"12\",\n                    \"expYear\": \"2022\",\n                    \"ccv\":\"123\"\n                },\n                \"cart\":[\n                    {\"id\":\"1234\", \"description\":\"redpants\", \"quantity\":\"1\", \"price\":\"4\"},\n                    {\"id\":\"5678\", \"description\":\"bluepants\", \"quantity\":\"1\", \"price\":\"4\"}\n                ],\n                \"total\":\"100\"}\n\n    def on_start(self):\n        self.login()\n\n    def login(self):\n        \"\"\"Login a random user\"\"\"\n        user = random.choice(users)\n        headers = {\"Content-Type\": \"application/json\"}  # Explicitly setting the Content-Type header\n        logging.warning(\"Auth User - Login user \" + user)\n        response = self.client.post(\"/login/\", json={\"username\": user, \"password\": \"vmware1!\"}, headers=headers)\n        if response.ok:\n            body = response.json()\n            # Safely access the 'token' key, considering it might not be present\n            token = body.get(\"access_token\")\n            if token:\n                self.user.token = token  # Assuming you meant to store the token here\n                logging.warning(\"Successfully logged in\")\n            else:\n                logging.warning(\"Token not found in login response\")\n                # Handle cases where token is missing - perhaps by setting a flag or retrying login\n        else:\n            logging.warning(f\"Login failed for user {user}, status code {response.status_code}\")\n\n    @task\n    def checkout(self):\n        if not self.user.userid:\n            logging.warning(\"Not logged in, skipping 'Add to Checkout'\")\n            self.login()\n            headers = {\"Content-Type\": \"application/json\"}  # Explicitly setting the Content-Type header\n            userCart = self.client.get(\"/cart/items/\" + self.user.userid).json()\n            order = self.client.post(\"/order/add/\"+ self.user.userid, json=self.Order_Info, headers=headers)\n            logging.warning(f\"Posting order\")\n            return\n        headers = {\"Content-Type\": \"application/json\"}  # Explicitly setting the Content-Type header\n        userCart = self.client.get(\"/cart/items/\" + self.user.userid).json()\n        order = self.client.post(\"/order/add/\"+ self.user.userid, json=self.Order_Info, headers=headers)\n        logging.warning(f\"Posting order\")\nclass UserBehavior(SequentialTaskSet):\n    tasks = [AuthUserBrowsing]\nclass WebSiteUser(HttpUser):\n    sleep(3)  # Sleep on start of a user incase the target app isn't completely accessible yet.\n    tasks = [UserBehavior]\n    userid = \"\"\n    wait_time = between(0.25, 0.5)\n"
